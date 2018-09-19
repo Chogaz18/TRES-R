@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Geolocalizacion</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      #map {
+        height: 80%;
+      }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    <div id="map"></div>
+    <script>
+    var map, infoWindow;
+    var marker;
+    function initMap() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: -34.397, lng: 150.644},
+        zoom: 15
+      });
+      infoWindow = new google.maps.InfoWindow;
+
+      // Geolocacion por IP, no es funcional. Recomendable en moviles por el GPS
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          var pos=new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+          infoWindow.setPosition(pos);
+          infoWindow.setContent('Esta es tu locacion.');
+          infoWindow.open(map);
+          marker = new google.maps.Marker({
+              position: pos,
+              map: map,
+            });
+          map.setCenter(pos);
+          var icons = {
+              inside: {
+                icon: 'file:///C:/Users/omid1/Desktop/FABIO/TRES_R/icons/car-dealer.svg'
+              },
+              outside: {
+                icon: 'file:///C:/Users/omid1/Desktop/FABIO/TRES_R/icons/car-wash.svg'
+              }
+            };
+            var puntos = [
+              {
+                position: new google.maps.LatLng(-8.134684, -79.040946),
+              }, {
+                position: new google.maps.LatLng(-8.125847, -79.026958),
+              }];
+              puntos.forEach(function(feature) {
+                var distance_in_meters = distance(pos  ,feature.position);
+                if(distance_in_meters<1001){
+                  var marker1 = new google.maps.Marker({
+                    position: feature.position,
+                    icon: icons['inside'].icon,
+                    map: map
+                  });
+                }else {
+                  var marker1 = new google.maps.Marker({
+                    position: feature.position,
+                    icon: icons['outside'].icon,
+                    map: map
+                });
+                }
+        });
+        }, function() {
+          handleLocationError(true, infoWindow, map.getCenter());
+        });
+      } else {
+        handleLocationError(false, infoWindow, map.getCenter());
+      }
+  }
+    function distance(tu_ubicacion,distance_of_bus){
+      return google.maps.geometry.spherical.computeDistanceBetween(tu_ubicacion,distance_of_bus);
+    }
+    function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+      infoWindow.setPosition(pos);
+      infoWindow.setContent(browserHasGeolocation ?
+                            'Error: La Geolocacion ha fallado.' :
+                            'Error: Tu navegador no hace soporte a la Geolocacion.');
+      infoWindow.open(map);
+    }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCWgEjuWSwFWMyx7qmvn07feSZeQngHd4E&v=3&libraries=geometry&callback=initMap"
+    async defer></script>
+  </body>
+</html>
